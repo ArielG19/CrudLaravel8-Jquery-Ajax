@@ -22,6 +22,9 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::resource('/categorias', App\Http\Controllers\CategoriaController::class);
-Route::resource('/galeria', App\Http\Controllers\GaleriaController::class);
 Route::get('/listar-categorias', [App\Http\Controllers\CategoriaController::class, 'listarCategoria']);
+
+Route::resource('/galeria', App\Http\Controllers\GaleriaController::class);
+Route::get('/listar-imagenes', [App\Http\Controllers\GaleriaController::class, 'listarImagenes']);
+
 

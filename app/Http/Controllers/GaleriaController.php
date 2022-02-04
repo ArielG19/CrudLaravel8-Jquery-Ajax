@@ -18,6 +18,13 @@ class GaleriaController extends Controller
         
         return view('galeria.index');
     }
+    public function listarImagenes()
+    {
+        $imagenes = Image::Orderby('id','desc')->paginate(5);
+        //dd($imagenes);
+        return view('galeria.listar-imagenes',['imagenes'=>$imagenes]);
+             
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -54,18 +61,36 @@ class GaleriaController extends Controller
            if(!$validator->passes()){
                return response()->json(['code'=>0,'error'=>$validator->errors()->toArray()]);
            }else{
-               $path = 'files/';
-               $file = $request->file('img');
-               $file_name = time().'_'.$file->getClientOriginalName();
+                 if($request->hasFile('img')) {
+                    $imagen = $request->file('img');
+                    $filename = time() . '.' . $imagen->getClientOriginalExtension();
+                    $path = public_path('imagenes');
+                    //$destinationPath = public_path('/images/productImages/');
+                    $imagen->move($path, $filename);
+                    
+                /*}
+                //if($request->hasFile('imagen'))
+                //{
+                    $imagen= $request->file('imagen');
+                    $filename= time(). '.'. $imagen->getClientOriginalExtension();
+                    Image::make($imagen)->resize(300,300)->save(public_path('perfil/'.$filename));
 
-            //$upload = $file->storeAs($path, $file_name);
-            $upload = $file->storeAs($path, $file_name, 'public');
+                    $user=Auth::user();
+                    $user->imagen =$filename;
+                    $user->save();
+                //}
+                $path = 'files/';
+                $file = $request->file('img');
+                $file_name = time().'_'.$file->getClientOriginalName();
+                //$upload = $file->storeAs($path, $file_name);
+                $upload = $file->storeAs($path, $file_name, 'public');
 
-               if($upload){
+
+               if($upload){*/
                     //almacena datos
                    Image::insert([
                        'nombre'=>$request->nombre,
-                       'imagen'=>$file_name,
+                       'imagen'=>$filename,
                    ]);
 
                    //mensaje exitoso

@@ -13,6 +13,10 @@
                     <div class="mb-3">
                          <span class="text-danger error-text nombre_error"></span>
                     </div>
+                      <div class="alert alert-success alert-dismissible fade show" role="alert" style="display:none" id="message-save">
+                      <strong>Creado correctamente</strong>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                      <div class="mb-3">
                          <span class="text-danger error-text img_error"></span>
                     </div>
@@ -34,25 +38,62 @@
             <div class="col-md-6">
               <div class="img-holder"></div>
             </div>
+            <div class="col-md-12">
+                <div id="mostrar-imagenes"></div>
+            </div>
     </div>
 </div>
 
 <script type="text/javascript">
-        $(function(){
-            $('#form').on('submit', function(e){
-                e.preventDefault();
-                var form = this;
+    //listamos cuando abrimos la pagina
+    $(document).ready(function(){
+        mostrarImagenes();
+    });
+    //Funcion para listar
+    var mostrarImagenes = function(){
                 $.ajax({
+                    type:'get',
+                    url:'listar-imagenes',
+                    success:function(data){
+                        //Llenamos el div con la info
+                        $('#mostrar-imagenes').empty().html(data);
+
+                    }
+                });
+    }
+    //paginación
+    $(document).on("click",".pagination li a",function(e){
+        //se produce un evento
+        e.preventDefault();
+        var url = $(this).attr("href");
+        $.ajax({
+            type:'get',
+            url:url,
+            success:function(data){ //data contiene toda la informacion generada
+                $('#mostrar-imagenes').empty().html(data);
+
+            }
+        });
+    });
+    //Mandamos a guardar los datos del form
+    $(function(){
+        $('#form').on('submit', function(e){
+            e.preventDefault();
+            var form = this;
+            $.ajax({
                     url:$(form).attr('action'),
                     method:$(form).attr('method'),
                     data:new FormData(form),
                     processData:false,
                     dataType:'json',
                     contentType:false,
+
+                    //si hay errores de validacion antes de guardar
                     beforeSend:function(){
                         $(form).find('span.error-text').text('');
                     },
                     success:function(data){
+                        //si hay errores con la informacion
                         if(data.code == 0){
                             $.each(data.error, function(prefix,val){
                                 //console.log(prefix);
@@ -60,14 +101,20 @@
                                 $(form).find('span.'+prefix+'_error').text(val[0]);
                             });
                         }else{
+                            //Si todo esta correcto guardamos
                             $(form)[0].reset();
                             //mostramos alerta de exito
-                            alert(data.msg);
-                            //fetchAllProducts();
+                            //alert(data.msg);
+                            $("#message-save").fadeIn();
+                            $("#message-save").show().delay(2000).fadeOut(2);
+                            $(".img-fluid").fadeIn();
+                            $(".img-fluid").show().delay(1).fadeOut(1);
+                            mostrarImagenes();
+                            
                         }
                     }
-                });
             });
+        });
 
             //codigo para mostrar la imagen que se esta subiendo
             $('input[type="file"][name="img"]').val('');
@@ -100,7 +147,7 @@
                      $('#AllProducts').html(data.result);
                 },'json');
             }*/
-        
+                  
     
         })
 </script>
