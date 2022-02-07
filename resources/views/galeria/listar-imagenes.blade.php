@@ -21,7 +21,7 @@
 							
 								<td>
 				             		<!--en la ruta pasamos el parametro para mostrar el id y poder editar o eliminar luego-->
-									<a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateModal" Onclick=' MostrarCategoria({{$img->id}});'>
+									<a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateModalImagenes" Onclick='updateImagenes({{$img->id}});'>
 									  Editar
 									</a>
 

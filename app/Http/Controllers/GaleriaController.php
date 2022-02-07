@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\GaleriaController;
+use Illuminate\Support\Facades\File;
 use App\Models\Image;
 
 class GaleriaController extends Controller
@@ -44,7 +45,7 @@ class GaleriaController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request->name);
+        //dd($request);
         //validacion de informacion
          $validator = \Validator::make($request->all(),[
               'nombre'=>'required|string|unique:images',
@@ -67,26 +68,6 @@ class GaleriaController extends Controller
                     $path = public_path('imagenes');
                     //$destinationPath = public_path('/images/productImages/');
                     $imagen->move($path, $filename);
-                    
-                /*}
-                //if($request->hasFile('imagen'))
-                //{
-                    $imagen= $request->file('imagen');
-                    $filename= time(). '.'. $imagen->getClientOriginalExtension();
-                    Image::make($imagen)->resize(300,300)->save(public_path('perfil/'.$filename));
-
-                    $user=Auth::user();
-                    $user->imagen =$filename;
-                    $user->save();
-                //}
-                $path = 'files/';
-                $file = $request->file('img');
-                $file_name = time().'_'.$file->getClientOriginalName();
-                //$upload = $file->storeAs($path, $file_name);
-                $upload = $file->storeAs($path, $file_name, 'public');
-
-
-               if($upload){*/
                     //almacena datos
                    Image::insert([
                        'nombre'=>$request->nombre,
@@ -118,7 +99,9 @@ class GaleriaController extends Controller
      */
     public function edit($id)
     {
-        //
+        //solicitamos la informacion de la tabla imagenes por id
+        $imagenes = Image::FindOrFail($id);
+        return response()->json($imagenes);
     }
 
     /**
@@ -128,9 +111,45 @@ class GaleriaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function updateImagenes(Request $request, $id){
+        //dd($request->all());
+        if($request->ajax()){
+
+                $imagenes = Image::FindOrFail($id);
+                $imagenes->nombre = $request->input('updateNombre');
+                //dd($imagenes);
+                if($request->hasFile('updateImg')) {
+
+                    //eliminar archivo anterior si existe
+                    $path = 'imagenes/'.$imagenes->imagen;
+                    if (File::exists($path)) {
+                        File::delete($path);
+                    }
+
+                    //guardamos archivo nuevo
+                    $imagen = $request->file('updateImg');
+                    $filename = time() . '.' . $imagen->getClientOriginalExtension();
+                    $path = public_path('imagenes');
+                    $imagen->move($path, $filename);
+                    $imagenes->imagen = $filename;
+                }
+                //guardamos y devolvemos los datos
+                $resultado = $imagenes->save();
+
+                 if($resultado){
+                    return response()->json(['success'=>'true', 'mensaje'=>'Se ha actualizado correctamente']);
+                }else{
+                    return response()->json(['success'=>'false'],'mensaje'=>'No se ha podido actualizar');
+                }
+
+
+        }
+
+    }
     public function update(Request $request, $id)
     {
-        //
+        
+
     }
 
     /**

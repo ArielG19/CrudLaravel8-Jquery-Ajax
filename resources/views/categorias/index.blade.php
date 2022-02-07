@@ -111,30 +111,26 @@ $("#actualizar").click(function(event){
             var id = $("#id").val();
             var name = $("#nameUpdate").val();
             
-
             var route = "categorias/"+id+"";
             var token = $("#token").val();
-        
-    $.ajax({
-            url:route,
-                headers:{'X-CSRF-TOKEN':token},
-                type:'PUT',
-                dataType:'json',
-                data:{name:name},
+            $.ajax({
+                    url:route,
+                        headers:{'X-CSRF-TOKEN':token},
+                        type:'PUT',
+                        dataType:'json',
+                        data:{name:name},
+                        success:function(data){
+                                if(data.success=='true'){
+                                    listarCategoria();
+                                    $("#updateModal").modal('toggle');
+                                    
+                                    //pintamos un mensaje
+                                    $("#message-update").fadeIn();
+                                    $("#message-update").show().delay(3000).fadeOut(3);   
 
-
-                success:function(data){
-                        if(data.success=='true'){
-                            listarCategoria();
-                            $("#updateModal").modal('toggle');
-                            
-                            //pintamos un mensaje
-                            $("#message-update").fadeIn();
-                            $("#message-update").show().delay(3000).fadeOut(3);   
-
+                                }
                         }
-                }
-    });
+            });
 });
 </script>
 @endsection

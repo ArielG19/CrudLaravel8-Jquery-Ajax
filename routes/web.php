@@ -26,5 +26,6 @@ Route::get('/listar-categorias', [App\Http\Controllers\CategoriaController::clas
 
 Route::resource('/galeria', App\Http\Controllers\GaleriaController::class);
 Route::get('/listar-imagenes', [App\Http\Controllers\GaleriaController::class, 'listarImagenes']);
+Route::post('/update-imagenes/{id}', [App\Http\Controllers\GaleriaController::class, 'updateImagenes']);
 
 

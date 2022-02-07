@@ -22,7 +22,7 @@
                     </div>
                    <div class="mb-3">
                         <label for="InputName" class="form-label">Nombre</label>
-                        <input type="text" name="nombre" class="form-control" id="InputName">
+                        <input type="text" name="nombre" class="form-control">
                     </div>
                     <div class="mb-3">
                         <input type="file" name="img" class="form-control">
@@ -39,6 +39,7 @@
               <div class="img-holder"></div>
             </div>
             <div class="col-md-12">
+                @include('galeria.modalUpdate')
                 <div id="mostrar-imagenes"></div>
             </div>
     </div>
@@ -80,6 +81,7 @@
         $('#form').on('submit', function(e){
             e.preventDefault();
             var form = this;
+            //console.log(form);
             $.ajax({
                     url:$(form).attr('action'),
                     method:$(form).attr('method'),
@@ -138,18 +140,83 @@
                 }else{
                     $(img_holder).empty();
                 }
-            });
-        
-            //Fetch all products
-            /*fetchAllProducts();
-            function fetchAllProducts(){
-                $.get('{{--route("galeria")--}}',{}, function(data){
-                     $('#AllProducts').html(data.result);
-                },'json');
-            }*/
-                  
+            });                  
     
         })
+        function updateImagenes(id){
+                var route = "galeria/"+id+"/edit";
+                $.get(route, function(data){
+                    //console.log(data);
+                    $("#id").val(data.id);
+                    $("#InputName").val(data.nombre);
+                    //almacena la ruta de la imagen
+                    var imagen = '/imagenes/'+ data.imagen;
+                    //al atributo src le insertamos la ruta
+                    $("#insert-img").attr("src",''+imagen); 
+                    //var url2 = "galeria/"+ data.id+"";
+                    //console.log(url);
+                    //al atributo src le insertamos la ruta
+                   //$("#formUpdate").attr("action",''+ url2); 
+
+                });
+        }
+
+        //codigo para mostrar la imagen que se esta actulizando
+        $('input[type="file"][name="updateImg"]').val('');
+                //Image preview
+                $('input[type="file"][name="updateImg"]').on('change', function(){
+                    var img_path2 = $(this)[0].value;
+                    var img_holder2 = $('.img-holderUpdate');
+                    var extension2 = img_path2.substring(img_path2.lastIndexOf('.')+1).toLowerCase();
+                    if(extension2 == 'jpeg' || extension2 == 'jpg' || extension2 == 'png'){
+                         if(typeof(FileReader) != 'undefined'){
+                              img_holder2.empty();
+                              var reader2 = new FileReader();
+                              reader2.onload = function(e){
+                                  $('<img/>',{'src':e.target.result,'class':'img-fluid2','style':'width:200px; height:150px;margin-bottom:10px;object-fit:cover'}).appendTo(img_holder2);
+                              }
+                              img_holder2.show();
+                              reader2.readAsDataURL($(this)[0].files[0]);
+                         }else{
+                             $(img_holder2).html('This browser does not support FileReader');
+                         }
+                    }else{
+                        $(img_holder2).empty();
+                    }
+                });
+    //actualizando formulario
+    $('#formUpdate').on('submit', function(e){
+            e.preventDefault();
+            var form2 = this;
+            var id = $("#id").val();
+            var token = $("#token").val();
+            var route2 = "update-imagenes/"+id+"";
+            //console.log(route2);
+            $.ajax({
+                    url:route2,
+                        headers:{'X-CSRF-TOKEN':token},
+                        type:'post',
+                        dataType:'json',
+                        data:new FormData(form2),
+                        processData:false,
+                        contentType:false,
+                        success:function(data){
+                                if(data.success=='true'){
+                                    //listarCategoria();
+                                    mostrarImagenes();
+                                    $("#updateModalImagenes").modal('toggle');
+                                    //console.log(data);
+                                    //pintamos un mensaje
+                                    //$("#message-update").fadeIn();
+                                    //$("#message-update").show().delay(3000).fadeOut(3);   
+                                    $(".img-fluid2").fadeIn();
+                                    $(".img-fluid2").show().delay(1).fadeOut(1);
+
+                                }
+                        }
+            });
+        })
+
 </script>
 @endsection
 
